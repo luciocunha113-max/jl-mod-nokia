@@ -31,4 +31,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: apk-nokia
-          path: JL-Mod/app/build/outputs/apk/**/**.apk
+          path: JL-Mod/app/build/outputs/apk/emulator/debug/app-emulator-debug.apk
