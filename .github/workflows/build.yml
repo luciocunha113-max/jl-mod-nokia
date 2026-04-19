@@ -1,4 +1,4 @@
-name: Build APK
+name: Build APK Nokia
 on: [push]
 jobs:
   build:
@@ -9,22 +9,25 @@ jobs:
         with:
           java-version: '17'
           distribution: 'microsoft'
-      - name: Clone JL-Mod with submodules
+      - name: Clone JL-Mod
         run: git clone --recurse-submodules https://github.com/woesss/JL-Mod.git
-      - name: Apply Nokia theme colors
+      - name: Apply Nokia theme
+        working-directory: JL-Mod/app/src/main/res/values
         run: |
-          cp JL-Mod-0.87.1/app/src/main/res/values/colors.xml JL-Mod/app/src/main/res/values/colors.xml
-          cp JL-Mod-0.87.1/app/src/main/res/values/styles.xml JL-Mod/app/src/main/res/values/styles.xml
+          sed -i 's/#212121/#000000/g' colors.xml
+          sed -i 's/#1c1c1c/#000000/g' colors.xml
+          sed -i 's/#ff2e51/#4CAF50/g' colors.xml
+          sed -i 's/#fafafa/#111111/g' colors.xml
+          sed -i 's/#ffffff/#1A1A1A/g' colors.xml
+          sed -i 's/Theme.AppCompat.DayNight.DarkActionBar/Theme.AppCompat/g' styles.xml
       - name: Create keystore
+        working-directory: JL-Mod
         run: |
-          cd JL-Mod
           keytool -genkey -v -keystore debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
-          echo "keyAlias=androiddebugkey" > keystore.properties
-          echo "keyPassword=android" >> keystore.properties
-          echo "storeFile=debug.keystore" >> keystore.properties
-          echo "storePassword=android" >> keystore.properties
+          printf 'keyAlias=androiddebugkey\nkeyPassword=android\nstoreFile=debug.keystore\nstorePassword=android\n' > keystore.properties
       - name: Build
-        run: cd JL-Mod && chmod +x gradlew && ./gradlew assembleDebug
+        working-directory: JL-Mod
+        run: chmod +x gradlew && ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: apk-nokia
