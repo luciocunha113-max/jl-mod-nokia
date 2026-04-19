@@ -4,8 +4,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'microsoft'
@@ -21,7 +21,7 @@ jobs:
           echo "storePassword=android" >> keystore.properties
       - name: Build
         run: cd JL-Mod-0.87.1 && chmod +x gradlew && ./gradlew assembleDebug
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: apk-nokia
           path: JL-Mod-0.87.1/app/build/outputs/apk/debug/app-debug.apk
