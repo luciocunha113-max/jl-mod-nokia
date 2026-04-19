@@ -11,12 +11,15 @@ jobs:
           distribution: 'microsoft'
       - name: Clone JL-Mod
         run: git clone --recurse-submodules https://github.com/woesss/JL-Mod.git
-      - name: Black toolbar
+      - name: Black toolbar and red icon background
         run: |
           sed -i 's/#262e37/#000000/g' JL-Mod/app/src/main/res/values-night/colors.xml
           sed -i 's/#20272f/#000000/g' JL-Mod/app/src/main/res/values-night/colors.xml
-      - name: Create red icon
-        run: pip install Pillow -q && python3 create_icon.py
+          sed -i 's/#4D8A99/#8B0000/g' JL-Mod/app/src/main/res/values/colors.xml
+      - name: Create icon foreground
+        run: |
+          pip install Pillow -q
+          python3 create_icon.py
       - name: Create keystore
         working-directory: JL-Mod
         run: |

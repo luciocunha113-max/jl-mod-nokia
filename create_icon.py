@@ -1,5 +1,4 @@
 from PIL import Image, ImageDraw, ImageFont
-import os
 
 sizes = {
     'mdpi': 48, 'hdpi': 72, 'xhdpi': 96,
@@ -7,10 +6,9 @@ sizes = {
 }
 
 for density, size in sizes.items():
-    img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    r = size // 5
-    draw.rounded_rectangle([0, 0, size-1, size-1], radius=r, fill=(139, 0, 0, 255))
+    # Foreground: texto branco em fundo transparente
+    fg = Image.new('RGBA', (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(fg)
     jl_size = int(size * 0.42)
     me_size = int(size * 0.22)
     try:
@@ -24,10 +22,15 @@ for density, size in sizes.items():
     jl_h = jl_bbox[3] - jl_bbox[1]
     me_bbox = draw.textbbox((0,0), "2ME", font=font_me)
     me_w = me_bbox[2] - me_bbox[0]
-    total_h = jl_h + me_bbox[3] - me_bbox[1] + int(size * 0.04)
-    y_start = (size - total_h) // 2
-    draw.text(((size - jl_w) // 2, y_start), "JL", fill=(255,255,255,255), font=font_jl)
-    draw.text(((size - me_w) // 2, y_start + jl_h + int(size*0.04)), "2ME", fill=(255,220,220,255), font=font_me)
-    out = f'JL-Mod/app/src/main/res/mipmap-{density}/ic_launcher.png'
-    img.save(out)
-    print(f'Saved {out}')
+    me_h = me_bbox[3] - me_bbox[1]
+    total_h = jl_h + me_h + int(size * 0.04)
+    y = (size - total_h) // 2
+    draw.text(((size - jl_w) // 2, y), "JL", fill=(255,255,255,255), font=font_jl)
+    draw.text(((size - me_w) // 2, y + jl_h + int(size*0.04)), "2ME", fill=(255,220,220,255), font=font_me)
+    fg.save(f'JL-Mod/app/src/main/res/mipmap-{density}/ic_launcher_foreground.png')
+
+    # Legacy icon completo: fundo vermelho + texto
+    full = Image.new('RGBA', (size, size), (139, 0, 0, 255))
+    full.paste(fg, (0, 0), fg)
+    full.save(f'JL-Mod/app/src/main/res/mipmap-{density}/ic_launcher.png')
+    print(f'Done {density}')
