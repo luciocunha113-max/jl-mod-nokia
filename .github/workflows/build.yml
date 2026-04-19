@@ -11,15 +11,28 @@ jobs:
           distribution: 'microsoft'
       - name: Clone JL-Mod
         run: git clone --recurse-submodules https://github.com/woesss/JL-Mod.git
-      - name: Apply Nokia theme
+      - name: Apply black theme
         working-directory: JL-Mod/app/src/main/res/values
         run: |
+          sed -i 's/#4D8AA9/#000000/g' colors.xml
+          sed -i 's/#4d8aa9/#000000/g' colors.xml
+          sed -i 's/#1a5276/#000000/g' colors.xml
           sed -i 's/#212121/#000000/g' colors.xml
           sed -i 's/#1c1c1c/#000000/g' colors.xml
-          sed -i 's/#ff2e51/#4CAF50/g' colors.xml
-          sed -i 's/#fafafa/#111111/g' colors.xml
-          sed -i 's/#ffffff/#1A1A1A/g' colors.xml
-          sed -i 's/Theme.AppCompat.DayNight.DarkActionBar/Theme.AppCompat/g' styles.xml
+          sed -i 's/#2e2e2e/#000000/g' colors.xml
+          sed -i 's/#ff2e51/#8B0000/g' colors.xml
+          sed -i 's/#FF2E51/#8B0000/g' colors.xml
+          sed -i 's/#ffb62e/#8B0000/g' colors.xml
+          cat colors.xml
+      - name: Recolor launcher icon red
+        run: |
+          sudo apt-get install -y imagemagick
+          find JL-Mod/app/src/main/res -name "ic_launcher_foreground.png" | while read f; do
+            convert "$f" +level-colors "#8B0000," "$f"
+          done
+          find JL-Mod/app/src/main/res -name "ic_launcher.png" | while read f; do
+            convert "$f" +level-colors "#8B0000," "$f"
+          done
       - name: Create keystore
         working-directory: JL-Mod
         run: |
@@ -27,7 +40,7 @@ jobs:
           printf 'keyAlias=androiddebugkey\nkeyPassword=android\nstoreFile=debug.keystore\nstorePassword=android\n' > keystore.properties
       - name: Build
         working-directory: JL-Mod
-        run: chmod +x gradlew && ./gradlew assembleDebug
+        run: chmod +x gradlew && ./gradlew assembleEmulatorDebug
       - uses: actions/upload-artifact@v4
         with:
           name: apk-nokia
