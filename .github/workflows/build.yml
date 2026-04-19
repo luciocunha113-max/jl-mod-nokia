@@ -9,19 +9,23 @@ jobs:
         with:
           java-version: '17'
           distribution: 'microsoft'
-      - name: Extract zip
-        run: unzip JL-Mod-0.87.1.zip
+      - name: Clone JL-Mod with submodules
+        run: git clone --recurse-submodules https://github.com/woesss/JL-Mod.git
+      - name: Apply Nokia theme colors
+        run: |
+          cp JL-Mod-0.87.1/app/src/main/res/values/colors.xml JL-Mod/app/src/main/res/values/colors.xml
+          cp JL-Mod-0.87.1/app/src/main/res/values/styles.xml JL-Mod/app/src/main/res/values/styles.xml
       - name: Create keystore
         run: |
-          cd JL-Mod-0.87.1
+          cd JL-Mod
           keytool -genkey -v -keystore debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
           echo "keyAlias=androiddebugkey" > keystore.properties
           echo "keyPassword=android" >> keystore.properties
           echo "storeFile=debug.keystore" >> keystore.properties
           echo "storePassword=android" >> keystore.properties
       - name: Build
-        run: cd JL-Mod-0.87.1 && chmod +x gradlew && ./gradlew assembleDebug
+        run: cd JL-Mod && chmod +x gradlew && ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: apk-nokia
-          path: JL-Mod-0.87.1/app/build/outputs/apk/debug/app-debug.apk
+          path: JL-Mod/app/build/outputs/apk/debug/app-debug.apk
