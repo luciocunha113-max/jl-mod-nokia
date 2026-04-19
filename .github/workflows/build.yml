@@ -17,7 +17,7 @@ jobs:
           sed -i 's/#20272f/#000000/g' JL-Mod/app/src/main/res/values-night/colors.xml
       - name: Red icon from J2ME Loader
         run: |
-          pip install Pillow -q
+          pip install Pillow numpy -q
           for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
             wget -q "https://raw.githubusercontent.com/nikita36078/J2ME-Loader/master/app/src/main/res/mipmap-${density}/ic_launcher.png" -O /tmp/icon_${density}.png
           done
