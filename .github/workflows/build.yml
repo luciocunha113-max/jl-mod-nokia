@@ -11,28 +11,37 @@ jobs:
           distribution: 'microsoft'
       - name: Clone JL-Mod
         run: git clone --recurse-submodules https://github.com/woesss/JL-Mod.git
-      - name: Apply black theme
-        working-directory: JL-Mod/app/src/main/res/values
+      - name: Black toolbar
         run: |
-          sed -i 's/#4D8AA9/#000000/g' colors.xml
-          sed -i 's/#4d8aa9/#000000/g' colors.xml
-          sed -i 's/#1a5276/#000000/g' colors.xml
-          sed -i 's/#212121/#000000/g' colors.xml
-          sed -i 's/#1c1c1c/#000000/g' colors.xml
-          sed -i 's/#2e2e2e/#000000/g' colors.xml
-          sed -i 's/#ff2e51/#8B0000/g' colors.xml
-          sed -i 's/#FF2E51/#8B0000/g' colors.xml
-          sed -i 's/#ffb62e/#8B0000/g' colors.xml
-          cat colors.xml
-      - name: Recolor launcher icon red
+          sed -i 's/#262e37/#000000/g' JL-Mod/app/src/main/res/values-night/colors.xml
+          sed -i 's/#20272f/#000000/g' JL-Mod/app/src/main/res/values-night/colors.xml
+      - name: Red icon from J2ME Loader
         run: |
-          sudo apt-get install -y imagemagick
-          find JL-Mod/app/src/main/res -name "ic_launcher_foreground.png" | while read f; do
-            convert "$f" +level-colors "#8B0000," "$f"
+          pip install Pillow -q
+          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            wget -q "https://raw.githubusercontent.com/nikita36078/J2ME-Loader/master/app/src/main/res/mipmap-${density}/ic_launcher.png" -O /tmp/icon_${density}.png
           done
-          find JL-Mod/app/src/main/res -name "ic_launcher.png" | while read f; do
-            convert "$f" +level-colors "#8B0000," "$f"
-          done
+          python3 << 'PYEOF'
+          from PIL import Image
+          import numpy as np
+          import os
+
+          densities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']
+          for density in densities:
+              src = f'/tmp/icon_{density}.png'
+              dst = f'JL-Mod/app/src/main/res/mipmap-{density}/ic_launcher.png'
+              if not os.path.exists(src):
+                  continue
+              img = Image.open(src).convert('RGBA')
+              data = np.array(img, dtype=float)
+              # Shift hue: swap R and B channels to turn blue→red
+              r = data[:,:,0].copy()
+              data[:,:,0] = data[:,:,2]  # R = B
+              data[:,:,2] = r            # B = R
+              result = Image.fromarray(data.astype(np.uint8))
+              result.save(dst)
+              print(f'Done: {density}')
+          PYEOF
       - name: Create keystore
         working-directory: JL-Mod
         run: |
